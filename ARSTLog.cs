@@ -13,7 +13,7 @@ namespace ARSTLog
     internal class ARSTLogAPI
     {
         string _logPath = "";
-        public int counter = 0, maxCounter = 200000;
+        public int counter = 0, maxCounter = 20000;
         public bool autoApplyToFile = false;
 
         StringBuilder log = new StringBuilder();
