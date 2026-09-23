@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../routApiTest/routApiTest.csproj" Id="0abf7806-e6ac-4f80-95c2-ab05203ff921" />
+  <Project Path="protocolServer.csproj" Id="d4c76554-43c2-4644-9fc9-69fe3a02f734" />
+</Solution>
