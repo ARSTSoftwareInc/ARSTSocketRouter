@@ -26,7 +26,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.1.6", mainUrl = "", serverUrl = "";
+        static string ver = "0.1.7", mainUrl = "", serverUrl = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
@@ -82,7 +82,7 @@ namespace protocolServer
                     Console.WriteLine("Log system initializing...");
                     string log = logDir + "log.txt";
                     if (File.Exists(log)) File.Delete(log);
-                    ARSTLog.init(log);
+                    ARSTLog.init(log, "ARST PServer");
                     ARSTLog.autoApplyToFile = true;
                     ARSTLog.info("Pre initiaizing phase 1 complete!");
                     ARSTLog.info("Configuration system initializing...");
