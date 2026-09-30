@@ -70,7 +70,7 @@ namespace ARSTLog
 
         public void addToLog(string text, bool showDate = true)
         {
-            if (showDate) text = $"[{appIndentifier}] -str:{counter}- [{DateTime.Now.ToString()}] " + text;
+            if (showDate) text = $"[{DateTime.Now.ToString()}] " + text;
             log.Append($"[{appIndentifier}] -str:{counter}- {text}\n");
             Console.WriteLine($"[{appIndentifier}] {text}");
 
