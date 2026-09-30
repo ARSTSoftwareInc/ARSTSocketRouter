@@ -18,7 +18,6 @@ class RedisClient
     {
         try
         {
-            protocolServer.Program.ARSTLog.info("Initializing sending list timer...");
             string configuration = "localhost:6379";
             protocolServer.Program.ARSTLog.info($"Initializing Redis Database on '{configuration}'...");
             redis = ConnectionMultiplexer.Connect(configuration);
@@ -79,11 +78,11 @@ class RedisClient
             }
 
             if (payload.Length < 201) protocolServer.Program.ARSTLog.info($"Trancivering from:'{from}' -> to:'{to}'(data: '{payload}')");
-            else protocolServer.Program.ARSTLog.info($"Trancivering from:'{from}' -> to:'{to}'(data length: '{payload.Length}')");
+            else protocolServer.Program.ARSTLog.info($"Trancivering from:'{from}' -> to:'{to}'(data length: {payload.Length})");
 
             //sendTimer.Start();
 
-            connections[to].Send(payload);
+            connections[to].Send($"'{from}':{payload}");
             protocolServer.Program.socketStatus("Start session done", "OPERATION_SUCCESS", socket);
         }
         catch(Exception ex)
