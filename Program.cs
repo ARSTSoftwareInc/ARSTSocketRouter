@@ -26,7 +26,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.1.7", mainUrl = "", serverUrl = "";
+        static string ver = "0.1.8_pre", mainUrl = "", serverUrl = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
@@ -39,7 +39,7 @@ namespace protocolServer
                 Console.WriteLine("Protocol server process pre-initializing...");
 
                 string logDir = "/var/tmp/protocolServer-log/";
-                string logPath = "/etc/protocolServer/config.ini";
+                string confPath = "/etc/protocolServer/config.ini";
 
                 if (args.Length == 0) Console.WriteLine("\n*** command line arguments list empty ***\n");
                 else
@@ -54,17 +54,31 @@ namespace protocolServer
                         case "-log":
                             isNoBoot = true;
                             string log = logDir + "log.txt";
-                            Console.WriteLine("Checking log...");
+                            string log_err = logDir + "log_err.txt";
+
+                            Console.WriteLine($"Checking log... [log='{log}']");
                             if (!File.Exists(log)) throw new Exception("No log file on target directory: " + log);
                             Console.WriteLine("Writing log...");
                             Console.WriteLine($"\n***\n\n{File.ReadAllText(log)}\n\n***\n");
+                            Console.WriteLine($"Checking error log... [log_err='{log_err}']");
+                            if (File.Exists(log_err))
+                            {
+                                Console.WriteLine($"\n***\n\n{File.ReadAllText(log_err)}\n\n***\n");
+                                if(isYN("Delete error log?"))
+                                {
+                                    Console.WriteLine("Deleting error log...");
+                                    File.Delete(log_err);
+                                }
+                            }
+                            else Console.WriteLine("Error log not founded.");
+                            Console.WriteLine("Done.");
                             break;
                         case "-rstart":
                             isNoBoot = true;
                             Console.WriteLine("Initiating host restart...");
                             Process.Start("sudo", "systemctl restart pserver");
+                            Console.WriteLine("Done.");
                             //Process.Start("/local/usr/bin/python", "/home/arst/python/aprcs.py start mono /home/arst/Debug/protocolServer.exe");
-                            Environment.Exit(0);
                             break;
                         default: throw new Exception("Invalid argument!(Type '-help' for helping about commands)");
                     }
@@ -85,8 +99,8 @@ namespace protocolServer
                     ARSTLog.init(log, "ARST PServer");
                     ARSTLog.autoApplyToFile = true;
                     ARSTLog.info("Pre initiaizing phase 1 complete!");
-                    ARSTLog.info("Configuration system initializing...");
-                    config1.init(logPath);
+                    ARSTLog.info($"Configuration system initializing... [confPath='{confPath}']");
+                    config1.init(confPath);
                     ARSTLog.info("Configuration initialized!");
                     ARSTLog.info("Checking for root permission...\n");
                     if (!rootCheck()) throw new Exception("Server process must be runed in root!");
@@ -123,6 +137,13 @@ namespace protocolServer
                 }
             }
             else Environment.Exit(0);
+        }
+
+        static bool isYN(string text)
+        {
+            Console.WriteLine(text + " [y/n]");
+            if (Console.ReadLine() == "y") return true;
+            return false;
         }
 
         static bool rootCheck()
