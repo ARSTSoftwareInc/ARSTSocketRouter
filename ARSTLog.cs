@@ -84,7 +84,7 @@ namespace ARSTLog
             {
                 counter = 0;
                 log.Clear();
-                log.Append($"[{appIndentifier}] [{DateTime.Now.ToString()}] log automaticaly cleared!\n\n");
+                log.Append($"[{appIndentifier}] -str:{counter}- [{DateTime.Now.ToString()}] log automaticaly cleared!\n\n");
                 saveLog();
             }
             else counter++;
