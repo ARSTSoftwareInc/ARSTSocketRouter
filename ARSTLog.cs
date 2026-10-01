@@ -47,7 +47,7 @@ namespace ARSTLog
             }
             catch(Exception ex)
             {
-                throw new Exception("ARSTLog api error trace::sveLog(): " + ex.ToString());
+                throw new Exception("ARSTLog api error trace::saveLog(): " + ex.ToString());
             }
         }
 
