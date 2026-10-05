@@ -1,5 +1,4 @@
-﻿using ARSTConfig;
-using ARSTLog;
+﻿using ARSTLib;
 using Fleck;
 using Newtonsoft.Json.Linq;
 using StackExchange.Redis;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;

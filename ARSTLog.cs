@@ -1,4 +1,6 @@
-﻿using Microsoft.SqlServer.Server;
+﻿// ARSTLog ver 3.0
+
+using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
-namespace ARSTLog
+namespace ARSTLib
 {
     internal class ARSTLogAPI
     {
@@ -70,7 +72,7 @@ namespace ARSTLog
 
         public void addToLog(string text, bool showDate = true)
         {
-            if (showDate) text = $"[{appIndentifier}] -str:{counter}- [{DateTime.Now.ToString()}] " + text;
+            if (showDate) text = $"-str:{counter}- [{DateTime.Now.ToString()}] " + text;
             log.Append($"{text}\n");
             Console.WriteLine($"[{appIndentifier}] {text}");
 
@@ -85,6 +87,7 @@ namespace ARSTLog
                 counter = 0;
                 log.Clear();
                 log.Append($"[{appIndentifier}] -str:{counter}- [{DateTime.Now.ToString()}] log automaticaly cleared!\n\n");
+                Console.WriteLine($"[{appIndentifier}] [{DateTime.Now.ToString()}] ARSTLog --- addToLog:: log automaticaly cleared!");               
                 saveLog();
             }
             else counter++;

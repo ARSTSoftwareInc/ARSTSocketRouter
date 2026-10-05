@@ -1,4 +1,6 @@
-﻿using System;
+﻿// ARSTConfig ver 4.0
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -6,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.AccessControl;
 
-namespace ARSTConfig
+namespace ARSTLib
 {
     class aConfg
     {
