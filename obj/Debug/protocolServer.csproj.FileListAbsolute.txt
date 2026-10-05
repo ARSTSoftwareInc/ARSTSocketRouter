@@ -41,3 +41,4 @@ D:\VISUAL STUDIO\проекты\protocolServer\bin\Debug\System.Text.Json.dll
 D:\VISUAL STUDIO\проекты\protocolServer\bin\Debug\Newtonsoft.Json.xml
 D:\VISUAL STUDIO\проекты\protocolServer\bin\Debug\System.Text.Encodings.Web.xml
 D:\VISUAL STUDIO\проекты\protocolServer\bin\Debug\System.Text.Json.xml
+D:\VISUAL STUDIO\проекты\protocolServer\obj\Debug\protocolServer.exe.config
