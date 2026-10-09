@@ -24,7 +24,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.1.8", mainUrl = "", serverUrl = "";
+        static string ver = "0.1.9_pre", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
@@ -121,6 +121,7 @@ namespace protocolServer
                     mainUrl = File.ReadAllText("/var/tunnel_url.txt", Encoding.UTF8);
                     serverUrl = config1.read("serverUrl");
                     aliveTimeSeconds = Convert.ToInt32(config1.read("aliveTimeSeconds"));
+                    sshModeAccessKey = config1.read("sshModeAccessKey");
 
                     ARSTLog.addToLog($"========\nport={port}\nmainUrl={mainUrl}\nserveUrl={serverUrl}\naliveTimeSeconds={aliveTimeSeconds}\n========", false);
                     ARSTLog.info("Initializing redis database connection...");
@@ -139,7 +140,7 @@ namespace protocolServer
 
         static bool isYN(string text)
         {
-            Console.WriteLine(text + " [y/n]");
+            Console.Write($"\n{text} [y/n]");
             if (Console.ReadLine() == "y") return true;
             return false;
         }
@@ -167,8 +168,7 @@ namespace protocolServer
                     socket.OnClose = () => { RedisClient.RemoveDevice(socket); };
                 });
 
-                ARSTLog.info("Server started successful!");
-                ARSTLog.info("Status: SERVER_AWAIT_COMMAND\n");
+                ARSTLog.info("Server started successful!\n");
                 while (true) Thread.Sleep(1000);
             }
             catch(Exception ex)
@@ -221,7 +221,81 @@ namespace protocolServer
                             return;
                         }
 
-                        RedisClient.StartSession(socketConnection, (string)cmd["from"], (string)cmd["to"], (string)cmd["accessKey"], (string)cmd["payload"]);
+                        ARSTLog.info("Verifying session mode...");
+                        string sessionMode = "";
+                        if (cmd["mode"] != null)
+                        {
+                            string mode = (string)cmd["mode"];
+                            if (mode != "")
+                            {
+                                string[] modes = { "SHORT_S", "SSH_S" };
+
+                                for (int i = 0; i < modes.Length; i++)
+                                {
+                                    string mode1 = modes[i];
+                                    if (mode == mode1)
+                                    {
+                                        sessionMode = mode;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        ARSTLog.info("Target session mode: " + sessionMode);
+                        if (sessionMode == "" || sessionMode == "SHORTS") RedisClient.StartSession(socketConnection, (string)cmd["from"], (string)cmd["to"], (string)cmd["accessKey"], (string)cmd["payload"]);
+                        else if (sessionMode == "SSH_S")
+                        {
+                            string user = (string)cmd["from"];
+                            string accessKey = (string)cmd["accessKey"];
+                            string command = (string)cmd["command"];
+
+                            ARSTLog.info($"Initiating SSH mode session... [socketConnection='{socketConnection.ConnectionInfo.Id}', user='{user}']");
+                            socketStatus($"Processing SSH mode request to user '{user}' ...", "OPERATION_EXEC", socketConnection);
+
+                            ARSTLog.info($"Verifying security key... [accessKey='{accessKey}', sshModeAccessKey='{sshModeAccessKey}']");
+                            if (accessKey != sshModeAccessKey)
+                            {
+                                socketStatus($"Invalid ssh mode access key('{accessKey}').", "ACCESS_DENIED", socketConnection);
+                                return;
+                            }
+
+                            try
+                            {
+                                socketStatus($"Processing command('{command}')...", "OPERATION_EXEC", socketConnection);
+
+                                string prog = "", args = "";
+
+                                string[] data = command.Split(' ');
+                                prog = data[0];
+                                if (data.Length > 0) args = command.Remove(0, prog.Length + 1);
+
+                                ARSTLog.info($"Attached command data. [program='{prog}', args='{args}']");
+
+                                Process process = new Process();
+                                process.StartInfo.FileName = prog;
+                                process.StartInfo.Arguments = args;
+                                process.StartInfo.UseShellExecute = false;
+                                process.StartInfo.StandardErrorEncoding = Encoding.ASCII;
+                                process.StartInfo.RedirectStandardOutput = true;
+                                process.StartInfo.RedirectStandardError = true;
+                                ARSTLog.info($"Starting command... [program='{prog}', args='{args}']");
+                                process.Start();
+
+                                string output = process.StandardOutput.ReadToEnd();
+                                process.WaitForExit();
+
+                                int chunkSize = 4000;
+                                string part = "";
+                                for (int i = 0; i < output.Length; i += chunkSize) part = output.Substring(i, Math.Min(chunkSize, output.Length - i));
+
+                                 socketStatus($"Data from '{prog}': {part}", "OPERATION_SUCCESS", socketConnection);
+                            }
+                            catch (Exception ex)
+                            {
+                                socketStatus(ex.Message, "INVALID_SSH_MODE_REMOTE_COMMAND", socketConnection);
+                            }
+                        }
                         break;
                     case "CONN_STOP":
                         RedisClient.RemoveDevice(socketConnection);
@@ -238,7 +312,7 @@ namespace protocolServer
                         socketStatus($"{aliveTimeSeconds}", "YOU_CONNECTED", socketConnection);
                         break;
                     default:
-                        socketStatus($"Target mode not exists on system handler('{type}':{type.Length}).", "INVALID_MODE_TYPE", socketConnection);
+                        socketStatus($"Target type not exists on system handler('{type}':{type.Length}).", "INVALID_MODE_TYPE", socketConnection);
                         break;
                 }
             }
