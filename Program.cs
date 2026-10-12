@@ -25,7 +25,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.1.9_pre", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
+        static string ver = "0.1.9", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
