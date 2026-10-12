@@ -48,7 +48,7 @@ namespace protocolServer
                     {
                         case "-help":
                             isNoBoot = true;
-                            Console.WriteLine("Command line help.\n\n-help - write help command line list;\n-rstart - restarting main server host;\n-log - write log in to console.");
+                            Console.WriteLine("Command line help.\n\n-help - write help command line list;\n-reconf - open NANO to redacting the config file;\n-rstart - restarting main server host;\n-log - write log in to console.");
                             break;
                         case "-log":
                             isNoBoot = true;
@@ -269,7 +269,7 @@ namespace protocolServer
                         {
                             string user = (string)cmd["from"];
                             string accessKey = (string)cmd["accessKey"];
-                            string command = (string)cmd["command"];
+                            string command = (string)cmd["payload"];
 
                             ARSTLog.info($"Initiating SSH mode session... [socketConnection='{socketConnection.ConnectionInfo.Id}', user='{user}']");
                             socketStatus($"Processing SSH mode request to user '{user}' ...", "OPERATION_EXEC", socketConnection);
