@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
@@ -73,10 +74,15 @@ namespace protocolServer
                             break;
                         case "-rstart":
                             isNoBoot = true;
-                            Console.WriteLine("Initiating host restart...");
-                            Process.Start("sudo", "systemctl restart pserver");
-                            Console.WriteLine("Done.");
-                            //Process.Start("/local/usr/bin/python", "/home/arst/python/aprcs.py start mono /home/arst/Debug/protocolServer.exe");
+                            restartHost();
+                            break;
+                        case "-reconf":
+                            isNoBoot = true;
+                            Console.WriteLine($"Opening NANO to reconfig main configuration... [confPath='{confPath}']");
+                            Process.Start("sudo", "nano " + confPath);
+                            Console.WriteLine("Reconfiguring done.");
+                            if (isYN("Restart server?")) restartHost();
+                            else Console.WriteLine("Operation chanceled: done.");
                             break;
                         default: throw new Exception("Invalid argument!(Type '-help' for helping about commands)");
                     }
@@ -135,6 +141,22 @@ namespace protocolServer
                 }
             }
             else Environment.Exit(0);
+        }
+
+        static void restartHost()
+        {
+            try
+            {
+                Console.WriteLine("Initiating host restart...");
+                Process.Start("sudo", "systemctl restart pserver");
+                Process.Start("sudo", "pkill mono");
+                Console.WriteLine("Done.");
+                //Process.Start("/local/usr/bin/python", "/home/arst/python/aprcs.py start mono /home/arst/Debug/protocolServer.exe");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Restart protocol server host process failed: " + ex.Message);
+            }
         }
 
         static bool isYN(string text)
