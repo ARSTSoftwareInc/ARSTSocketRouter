@@ -82,7 +82,7 @@ namespace protocolServer
                             Process.Start("sudo", "nano " + confPath);
                             Console.WriteLine("Reconfiguring done.");
                             if (isYN("Restart server?")) restartHost();
-                            else Console.WriteLine("Operation chanceled: done.");
+                            else Console.WriteLine("Operation canceled: done.");
                             break;
                         default: throw new Exception("Invalid argument!(Type '-help' for helping about commands)");
                     }
@@ -161,7 +161,7 @@ namespace protocolServer
 
         static bool isYN(string text)
         {
-            Console.Write($"\n{text} [y/n] ");
+            Console.WriteLine($"\n{text} [y/n] ");
             if (Console.ReadLine() == "y") return true;
             return false;
         }
