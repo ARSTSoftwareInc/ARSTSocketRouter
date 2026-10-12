@@ -116,7 +116,6 @@ namespace protocolServer
                     ARSTLog.info("System initializing...");
                     ARSTLog.info("Attaching config...");
                     port = Convert.ToInt32(config1.read("port"));
-                    //mainUrl = config1.read("mainUrl");
                     ARSTLog.info("Pending main tunnel URL...");
                     mainUrl = File.ReadAllText("/var/tunnel_url.txt", Encoding.UTF8);
                     serverUrl = config1.read("serverUrl");
@@ -140,7 +139,7 @@ namespace protocolServer
 
         static bool isYN(string text)
         {
-            Console.Write($"\n{text} [y/n]");
+            Console.Write($"\n{text} [y/n] ");
             if (Console.ReadLine() == "y") return true;
             return false;
         }

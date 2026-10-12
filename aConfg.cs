@@ -1,4 +1,4 @@
-﻿// ARSTConfig ver 4.0
+﻿// ARSTConfig ver 4.2_pre
 
 using System;
 using System.Collections.Generic;
@@ -15,11 +15,22 @@ namespace ARSTLib
         public int lastCfgStringIndexOnFile = 0;
         public string path = "";
 
-        public void init(string cfgPath)
+        public void init(string cfgPath, string[] cfgParts = null)
         {
             try
             {
-                if (!File.Exists(cfgPath)) throw new Exception("Config file not found on target location: " + cfgPath);
+                if (!File.Exists(cfgPath))
+                {
+                    if(cfgParts == null) throw new Exception("Config file not found on target location: " + cfgPath);
+                    else
+                    {
+                        Console.WriteLine("aConfg::init(): Warning: could not find config file: " + cfgPath);
+                        Console.WriteLine("aConfg::init(): Info: Creating file: " + cfgPath);
+                        File.WriteAllLines(cfgPath, cfgParts);
+                        Console.WriteLine("aConfg::init(): Info: Default config file created done!");
+                    }
+                }
+
                 path = cfgPath;
             }
             catch(Exception ex)
