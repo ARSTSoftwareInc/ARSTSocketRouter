@@ -289,7 +289,8 @@ namespace protocolServer
 
                                 string[] data = command.Split(' ');
                                 prog = data[0];
-                                if (data.Length > 0) args = command.Remove(0, prog.Length + 1);
+                                ARSTLog.info($"Parsing command... [data[0]='{data[0]}', data.Length={data.Length}]");
+                                if (data.Length > 1) args = command.Remove(0, prog.Length + 1);
 
                                 ARSTLog.info($"Attached command data. [program='{prog}', args='{args}']");
 
