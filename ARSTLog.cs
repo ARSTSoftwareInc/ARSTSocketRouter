@@ -1,6 +1,5 @@
 ﻿// ARSTLog ver 3.0
 
-using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,25 +71,29 @@ namespace ARSTLib
 
         public void addToLog(string text, bool showDate = true)
         {
-            if (showDate) text = $"-str:{counter}- [{DateTime.Now.ToString()}] " + text;
-            log.Append($"{text}\n");
-            Console.WriteLine($"[{appIndentifier}] {text}");
-
-            if (autoApplyToFile)
-            {
-                if (lastCode == 2) saveLog(_logPath.Replace(Path.GetExtension(_logPath), "") + "_err" + Path.GetExtension(_logPath));
-                else saveLog();
-            }
-
             if(counter > maxCounter)
             {
                 counter = 0;
                 log.Clear();
-                log.Append($"[{appIndentifier}] -str:{counter}- [{DateTime.Now.ToString()}] log automaticaly cleared!\n\n");
+                log.Append($"-str:{counter}- [{DateTime.Now.ToString()}] log automaticaly cleared!\n\n");
                 Console.WriteLine($"[{appIndentifier}] [{DateTime.Now.ToString()}] ARSTLog --- addToLog:: log automaticaly cleared!");               
+                
                 saveLog();
             }
-            else counter++;
+            else 
+            {
+                if (showDate) text = $"-str:{counter}- [{DateTime.Now.ToString()}] " + text;
+                log.Append($"{text}\n");
+                Console.WriteLine($"[{appIndentifier}] {text}");
+
+                if (autoApplyToFile)
+                {
+                    if (lastCode == 2) saveLog(_logPath.Replace(Path.GetExtension(_logPath), "") + "_err" + Path.GetExtension(_logPath));
+                    else saveLog();
+                }
+
+                counter++;
+            }
 
             lastCode = 0;
         }
