@@ -57,8 +57,17 @@ namespace protocolServer
 
                             Console.WriteLine($"Checking log... [log='{log}']");
                             if (!File.Exists(log)) throw new Exception("No log file on target directory: " + log);
+                            Console.WriteLine("Reading log...");
+                            string[] logDataArray = File.ReadAllLines(log, Encoding.UTF8);
                             Console.WriteLine("Writing log...");
-                            Console.WriteLine($"\n***\n\n{File.ReadAllText(log)}\n\n***\n");
+                            Console.WriteLine($"\n***\n\n");
+                            for (int i = 0; i < logDataArray.Length; i++)
+                            {
+                                if (logDataArray[i].Contains("WARNING")) Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine(logDataArray[i]);
+                                Console.ForegroundColor = ConsoleColor.White;
+                            }
+                            Console.WriteLine("\n***\n");
                             Console.WriteLine($"Checking error log... [log_err='{log_err}']");
                             if (File.Exists(log_err))
                             {
@@ -236,7 +245,7 @@ namespace protocolServer
                         RedisClient.RegisterDevice(socketConnection, (string)cmd["name"], (string)cmd["accessKey"]);
                         break;
                     case "SESSION_START":
-                        if (cmd["from"] == null ^ cmd["to"] == null ^ cmd["accessKey"] == null ^ cmd["payload"] == null)
+                        if (cmd["name"] == null ^ cmd["to"] == null ^ cmd["accessKey"] == null ^ cmd["payload"] == null)
                         {
                             socketStatus("Missing fields.", "INVALID_SESSION_START_REQUEST", socketConnection);
                             return;
@@ -267,7 +276,7 @@ namespace protocolServer
                         if (sessionMode == "" || sessionMode == "SHORTS") RedisClient.StartSession(socketConnection, (string)cmd["from"], (string)cmd["to"], (string)cmd["accessKey"], (string)cmd["payload"]);
                         else if (sessionMode == "SSH_S")
                         {
-                            string user = (string)cmd["from"];
+                            string user = (string)cmd["name"];
                             string accessKey = (string)cmd["accessKey"];
                             string command = (string)cmd["payload"];
 
@@ -311,7 +320,7 @@ namespace protocolServer
                                 string part = "";
                                 for (int i = 0; i < output.Length; i += chunkSize) part = output.Substring(i, Math.Min(chunkSize, output.Length - i));
 
-                                 socketStatus($"Data from '{prog}': {part}", "OPERATION_SUCCESS", socketConnection);
+                                socketStatus($"Data from '{prog}': {part}", "OPERATION_SUCCESS", socketConnection);
                             }
                             catch (Exception ex)
                             {
