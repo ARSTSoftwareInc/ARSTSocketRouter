@@ -25,7 +25,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.1.9", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
+        static string ver = "0.2.0", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
@@ -132,7 +132,9 @@ namespace protocolServer
                     ARSTLog.info("Attaching config...");
                     port = Convert.ToInt32(config1.read("port"));
                     ARSTLog.info("Pending main tunnel URL...");
-                    mainUrl = File.ReadAllText("/var/tunnel_url.txt", Encoding.UTF8);
+                    string tdFile = "/var/tmp/tdf/tunnel_url.txt";
+                    if (File.Exists(tdFile)) mainUrl = File.ReadAllText(tdFile, Encoding.UTF8);
+                    else mainUrl = "NO_TARGET_URL_ACTIVE";
                     serverUrl = config1.read("serverUrl");
                     aliveTimeSeconds = Convert.ToInt32(config1.read("aliveTimeSeconds"));
                     sshModeAccessKey = config1.read("sshModeAccessKey");
@@ -157,8 +159,8 @@ namespace protocolServer
             try
             {
                 Console.WriteLine("Initiating host restart...");
-                Process.Start("sudo", "systemctl restart pserver");
                 Process.Start("sudo", "pkill mono");
+                Process.Start("sudo", "systemctl restart pserver");
                 Console.WriteLine("Done.");
                 //Process.Start("/local/usr/bin/python", "/home/arst/python/aprcs.py start mono /home/arst/Debug/protocolServer.exe");
             }
