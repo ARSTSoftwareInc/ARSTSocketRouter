@@ -25,7 +25,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.2.0", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
+        static string ver = "0.2.1", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
@@ -191,10 +191,7 @@ namespace protocolServer
                 var server = new WebSocketServer(serverUrl + ":" + port);
                 server.Start(socket =>
                 {
-                    socket.OnOpen = () =>
-                    {
-                        ARSTLog.info($"New device connected. [client='{socket.ConnectionInfo.Id.ToString()}']");
-                    };
+                    socket.OnOpen = () => { ARSTLog.info($"New device connected. [client='{socket.ConnectionInfo.Id.ToString()}']"); };
 
                     socket.OnMessage = message => { handleMessage(socket, message); };
                     socket.OnClose = () => { RedisClient.RemoveDevice(socket); };
@@ -275,7 +272,7 @@ namespace protocolServer
                         }
 
                         ARSTLog.info("Target session mode: " + sessionMode);
-                        if (sessionMode == "" || sessionMode == "SHORTS") RedisClient.StartSession(socketConnection, (string)cmd["from"], (string)cmd["to"], (string)cmd["accessKey"], (string)cmd["payload"]);
+                        if (sessionMode == "" || sessionMode == "SHORT_S") RedisClient.StartSession(socketConnection, (string)cmd["name"], (string)cmd["to"], (string)cmd["accessKey"], (string)cmd["payload"]);
                         else if (sessionMode == "SSH_S")
                         {
                             string user = (string)cmd["name"];
