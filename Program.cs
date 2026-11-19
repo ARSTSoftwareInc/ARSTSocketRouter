@@ -25,7 +25,7 @@ namespace protocolServer
         public static ARSTLogAPI ARSTLog = new ARSTLogAPI();
         public static aConfg config1 = new aConfg();
 
-        static string ver = "0.2.1", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
+        static string ver = "0.2.2", mainUrl = "", serverUrl = "", sshModeAccessKey = "";
         public static int port = 0, aliveTimeSeconds = 0;
         static bool isNoBoot = false;
 
@@ -71,8 +71,20 @@ namespace protocolServer
                             Console.WriteLine($"Checking error log... [log_err='{log_err}']");
                             if (File.Exists(log_err))
                             {
-                                Console.WriteLine($"\n***\n\n{File.ReadAllText(log_err)}\n\n***\n");
-                                if(isYN("Delete error log?"))
+                                string[] errLogDataArray = File.ReadAllLines(log_err, Encoding.UTF8);
+                                Console.WriteLine("Writing error log...");
+                                Console.WriteLine($"\n***\n\n");
+                                for (int i = 0; i < logDataArray.Length; i++)
+                                {
+                                    if (logDataArray[i].Contains("WARNING")) Console.ForegroundColor = ConsoleColor.Yellow;
+                                    else if (logDataArray[i].Contains("ERROR")) Console.ForegroundColor = ConsoleColor.Red;
+
+                                    Console.WriteLine(logDataArray[i]);
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                }
+                                Console.WriteLine("\n***\n");
+
+                                if (isYN("Delete error log?"))
                                 {
                                     Console.WriteLine("Deleting error log...");
                                     File.Delete(log_err);
@@ -159,10 +171,8 @@ namespace protocolServer
             try
             {
                 Console.WriteLine("Initiating host restart...");
-                Process.Start("sudo", "pkill mono");
                 Process.Start("sudo", "systemctl restart pserver");
                 Console.WriteLine("Done.");
-                //Process.Start("/local/usr/bin/python", "/home/arst/python/aprcs.py start mono /home/arst/Debug/protocolServer.exe");
             }
             catch(Exception ex)
             {
@@ -359,6 +369,7 @@ namespace protocolServer
                 Console.ForegroundColor = ConsoleColor.Red;
                 ARSTLog.error($"Internal critic error::{errCode}: {errText}");
                 Console.ForegroundColor = ConsoleColor.White;
+                ARSTLog.warn("Server process criticaly shutdowned.");
 
                 Environment.Exit(1);
             }

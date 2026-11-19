@@ -80,10 +80,8 @@ class RedisClient
             if (payload.Length < 201) protocolServer.Program.ARSTLog.info($"Trancivering from:'{from}' -> to:'{to}'(data: '{payload}')");
             else protocolServer.Program.ARSTLog.info($"Trancivering from:'{from}' -> to:'{to}'(data length: {payload.Length})");
 
-            //sendTimer.Start();
-
-            connections[to].Send($"'{from}':{payload}");
-            protocolServer.Program.socketStatus("Start session done", "OPERATION_SUCCESS", socket);
+            connections[to].Send($"{from}:{payload}");
+            protocolServer.Program.socketStatus("Session done", "OPERATION_SUCCESS", socket);
         }
         catch(Exception ex)
         {
